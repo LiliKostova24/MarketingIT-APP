@@ -1,0 +1,63 @@
+﻿@model IEnumerable<MarketingIT.Models.Event>
+
+@{
+    ViewData["Title"] = "Browse Events";
+}
+
+<div class="container py-5">
+  <h2 class="mb-4">Upcoming Events</h2>
+
+  @if (!Model.Any())
+  {
+    <div class="alert alert-info">
+      There are no upcoming events.
+    </div>
+  }
+  else
+  {
+    <div class="row g-4">
+      @foreach (var ev in Model)
+      {
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">@ev.Title</h5>
+              <p class="card-text mb-3">@ev.Description</p>
+
+              <ul class="list-unstyled mb-4">
+                <li><strong>Date:</strong> @ev.Date:f</li>
+                <li><strong>Location:</strong> @ev.Location</li>
+                @if (ev.Company != null)
+                {
+                  <li><strong>Organizer:</strong> @ev.Company.FirstName @ev.Company.LastName</li>
+                }
+              </ul>
+
+              <form asp-action="ToggleSubscription"
+                    method="post"
+                    class="mt-auto">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="eventId" value="@ev.Id" />
+                <button type="submit" class="btn btn-outline-primary w-100">
+                  @(ev.Subscriptions.Any(s => s.UserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                     ? "Unsubscribe"
+                     : "Subscribe")
+                </button>
+              </form>
+
+              <div class="mt-3 text-center text-muted small">
+                @ev.Subscriptions.Count() subscriber@(ev.Subscriptions.Count() == 1 ? "" : "s")
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+}
+
+

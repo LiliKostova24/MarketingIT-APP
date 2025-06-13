@@ -1,0 +1,331 @@
+﻿@model MarketingIT.Models.HomeViewModel
+@using MarketingIT.Models
+
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<main class="container py-4">
+
+  <!-- CREATE NEW POST -->
+
+<div class="container py-5">
+  <div class="card mb-5 shadow-sm">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">Create New Post</h5>
+    </div>
+    <div class="card-body">
+      <form asp-action="PostContent" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="alert alert-danger d-none" id="postValidation"></div>
+
+        <div class="mb-3">
+          <label asp-for="PostForm.Type" class="form-label">Type</label>
+          <select asp-for="PostForm.Type" class="form-select" id="postType">
+            <option value="">— select —</option>
+            <option value="Post">Post</option>
+            <option value="Article">Article</option>
+            <option value="Survey">Survey</option>
+          </select>
+          <span asp-validation-for="PostForm.Type" class="text-danger"></span>
+        </div>
+
+        <!-- POST fields -->
+        <div id="postFields" style="display:none;">
+          <div class="mb-3">
+            <label asp-for="PostForm.Text" class="form-label">Text</label>
+            <textarea asp-for="PostForm.Text" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="PostForm.Text" class="text-danger"></span>
+          </div>
+          <div class="mb-3">
+            <label asp-for="PostForm.Photo" class="form-label">Image</label>
+            <input asp-for="PostForm.Photo" type="file" class="form-control" />
+            <span asp-validation-for="PostForm.Photo" class="text-danger"></span>
+          </div>
+        </div>
+
+        <!-- ARTICLE fields -->
+        <div id="articleFields" style="display:none;">
+          <div class="mb-3">
+            <label asp-for="PostForm.Text" class="form-label">Article</label>
+            <textarea asp-for="PostForm.Text" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="PostForm.Text" class="text-danger"></span>
+          </div>
+        </div>
+
+        <!-- SURVEY fields -->
+        <div id="surveyFields" style="display:none;">
+          <div class="mb-3">
+            <label asp-for="PostForm.SurveyQuestion" class="form-label">Question</label>
+            <input asp-for="PostForm.SurveyQuestion" class="form-control" />
+            <span asp-validation-for="PostForm.SurveyQuestion" class="text-danger"></span>
+          </div>
+          <div class="row g-2">
+            <div class="col-12 col-md-4">
+              <input asp-for="PostForm.SurveyOption1" class="form-control" placeholder="Answer #1" />
+              <span asp-validation-for="PostForm.SurveyOption1" class="text-danger"></span>
+            </div>
+            <div class="col-12 col-md-4">
+              <input asp-for="PostForm.SurveyOption2" class="form-control" placeholder="Answer #2" />
+              <span asp-validation-for="PostForm.SurveyOption2" class="text-danger"></span>
+            </div>
+            <div class="col-12 col-md-4">
+              <input asp-for="PostForm.SurveyOption3" class="form-control" placeholder="Answer #3" />
+              <span asp-validation-for="PostForm.SurveyOption3" class="text-danger"></span>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Create</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- …existing feed below… -->
+</div>
+
+
+ @{
+    // Turn your IQueryable into a List so we can page it
+    var eventsList = Model.UpcomingEvents?.ToList() 
+                     ?? new List<Event>();
+
+    // Build up “slides” of 4 events each
+    var slides    = new List<List<Event>>();
+    int pageSize  = 4;
+    for (int i = 0; i < eventsList.Count; i += pageSize)
+    {
+        slides.Add(eventsList
+                   .Skip(i)
+                   .Take(pageSize)
+                   .ToList());
+    }
+}
+<hr />
+
+<h3 class="mt-5 mb-4">Upcoming Events</h3>
+
+@if (!slides.Any())
+{
+    <p>No upcoming events.</p>
+}
+else
+{
+    <div class="position-relative" style="overflow:visible">
+      <div id="upcomingCarousel" class="carousel slide" data-bs-interval="false">
+        <div class="carousel-inner">
+          @for (int page = 0; page < slides.Count; page++)
+          {
+            var slice = slides[page];
+            <div class="carousel-item @(page == 0 ? "active" : "")">
+              <div class="row g-4">
+                @foreach (var ev in slice)
+                {
+                  <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 shadow-sm">
+                      <div class="card-body">
+                        <h5 class="card-title">@ev.Title</h5>
+                        <p class="card-text text-truncate">@ev.Description</p>
+                        <p class="mb-1">
+                          <strong>Date:</strong> @ev.Date:d MMM yyyy</p>
+                        <p><strong>Location:</strong> @ev.Location</p>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Prev arrow -->
+      <button type="button"
+              data-bs-target="#upcomingCarousel"
+              data-bs-slide="prev"
+              style="position:absolute; top:50%; left:-1rem;
+                     transform:translate(-50%,-50%);
+                     background:none; border:none; z-index:5;">
+        <i class="bi bi-chevron-left fs-2 text-dark"></i>
+      </button>
+
+      <!-- Next arrow -->
+      <button type="button"
+              data-bs-target="#upcomingCarousel"
+              data-bs-slide="next"
+              style="position:absolute; top:50%; right:-1rem;
+                     transform:translate(50%,-50%);
+                     background:none; border:none; z-index:5;">
+        <i class="bi bi-chevron-right fs-2 text-dark"></i>
+      </button>
+    </div>
+}
+<hr />
+
+
+  <!-- POSTS FEED -->
+  @if (Model.Posts?.Any() == true)
+  {
+    @foreach (var post in Model.Posts)
+    {
+      <div class="card mb-4">
+        <div class="card-body">
+          <!-- Author & Avatar -->
+          <h5 class="card-title d-flex align-items-center">
+            @if (post.User != null)
+            {
+              var avatar = !string.IsNullOrEmpty(post.User.AvatarPath)
+                           ? Url.Content(post.User.AvatarPath)
+                           : Url.Content("~/images/default-avatar.png");
+              <img src="@avatar"
+                   class="rounded-circle me-2"
+                   width="40" height="40"
+                   alt="Avatar" />
+              <a asp-controller="Profile"
+                 asp-action="Index"
+                 asp-route-username="@post.User.UserName"
+                 class="text-decoration-none text-primary">
+                @post.User.FirstName @post.User.LastName
+              </a>
+            }
+            else
+            {
+              <img src="~/images/default-avatar.png"
+                   class="rounded-circle me-2"
+                   width="40" height="40" />
+              <span class="text-muted">[Deleted User]</span>
+            }
+          </h5>
+
+          <!-- Type badge -->
+          <span class="badge bg-secondary mb-3">@post.Type</span>
+
+          <!-- Body by Type -->
+          @if (post.Type == PostType.Post)
+          {
+            <p class="card-text">@post.Content</p>
+
+            @* render each Image record *@
+            @if (post.Images?.Any() == true)
+            {
+              foreach (var img in post.Images)
+              {
+                <img src="@img.Url" class="img-fluid mb-2" alt="Post image" />
+              }
+            }
+          }
+          else if (post.Type == PostType.Article)
+          {
+            <div class="article-text mb-2">
+              @Html.Raw(post.Content)
+            </div>
+          }
+          else if (post.Type == PostType.Survey)
+          {
+            var opts = post.SurveyOptions?
+                           .Split("||", StringSplitOptions.RemoveEmptyEntries)
+                       ?? Array.Empty<string>();
+
+            <p class="card-text"><strong>@post.SurveyQuestion</strong></p>
+            <ul class="list-unstyled mb-2">
+              @foreach (var opt in opts)
+              {
+                <li>
+                  <label><input type="checkbox" disabled /> @opt</label>
+                </li>
+              }
+            </ul>
+          }
+
+          <!-- Meta, Likes, Comments... -->
+          <p class="text-muted mb-2">Posted on @post.CreatedAt:g</p>
+
+          <form asp-action="ToggleLike" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="postId" value="@post.Id" />
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+              ❤️ Like @(post.Likes?.Count ?? 0)
+            </button>
+          </form>
+
+          <!-- Comments -->
+          @if (post.Comments?.Any() == true)
+          {
+            <div class="mt-3">
+              <strong>Comments:</strong>
+              @foreach (var c in post.Comments)
+              {
+                <div class="border p-2 my-1 rounded bg-light">
+                  <small><strong>@c.User?.FirstName @c.User?.LastName</strong>: @c.Text</small>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Add Comment -->
+          <form asp-action="PostComment" method="post" class="mt-3">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="PostId" value="@post.Id" />
+            <div class="input-group">
+              <input type="text" name="Text" class="form-control" placeholder="Add a comment…" required />
+              <button type="submit" class="btn btn-outline-primary">Comment</button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    }
+  }
+  else
+  {
+    <p>No posts yet.</p>
+  }
+
+</main>
+
+@section Scripts {
+  <script>
+    const typeSelect = document.getElementById('postType');
+    const sections   = ['post', 'article', 'survey'];
+
+    function updateFormSections() {
+      const val = typeSelect.value?.toLowerCase();
+      sections.forEach(type => {
+        const sec = document.getElementById(type + 'Fields');
+        const isActive = (val === type);
+        sec.style.display = isActive ? 'block' : 'none';
+        // Enable only the visible inputs
+        sec.querySelectorAll('input, textarea, select').forEach(el => {
+          el.disabled = !isActive;
+        });
+      });
+    }
+
+    // Run on page load…
+    document.addEventListener('DOMContentLoaded', updateFormSections);
+    // …and whenever the dropdown changes
+    typeSelect.addEventListener('change', updateFormSections);
+
+    (function(){
+      const slides = document.querySelectorAll('#eventSlider .slide');
+      if (slides.length <= 1) return;  // nothing to do
+      let current = 0;
+
+      document.getElementById('prevSlide').addEventListener('click', () => {
+        slides[current].style.display = 'none';
+        current = (current - 1 + slides.length) % slides.length;
+        slides[current].style.display = 'block';
+      });
+      document.getElementById('nextSlide').addEventListener('click', () => {
+        slides[current].style.display = 'none';
+        current = (current + 1) % slides.length;
+        slides[current].style.display = 'block';
+      });
+    })();
+  </script>
+  <partial name="_ValidationScriptsPartial" />
+}
+
+
+

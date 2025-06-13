@@ -1,0 +1,57 @@
+@model ContactViewModel
+@{
+    ViewData["Title"] = "Contact Us";
+}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+<h2>Contact Us</h2>
+
+@if (ViewBag.Success != null)
+{
+    <div class="alert alert-success">
+        @ViewBag.Success
+    </div>
+}
+
+<form asp-controller="Contact"
+            asp-action="Index"
+            method="post"
+            class="shadow-sm rounded p-4 bg-white">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+          <label asp-for="Name" class="form-label"></label>
+          <input asp-for="Name" class="form-control" />
+          <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="Email" class="form-label"></label>
+          <input asp-for="Email" class="form-control" />
+          <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="Subject" class="form-label"></label>
+          <input asp-for="Subject" class="form-control" />
+          <span asp-validation-for="Subject" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+          <label asp-for="Message" class="form-label"></label>
+          <textarea asp-for="Message"
+                    class="form-control"
+                    rows="5"></textarea>
+          <span asp-validation-for="Message" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Send Message</button>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+}

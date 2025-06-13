@@ -1,0 +1,43 @@
+﻿/* wwwroot/css/site.css */
+
+/* Narrow, centered form container with padding and shadow */
+.contact-form-container {
+    max-width: 600px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+#upcomingCarousel,
+#upcomingCarousel .carousel-inner {
+    position: relative !important;
+    overflow: visible !important;
+}
+
+    /* 2) Always show and center the prev/next buttons */
+    #upcomingCarousel .carousel-control-prev,
+    #upcomingCarousel .carousel-control-next {
+        position: absolute !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        opacity: 1 !important;
+        z-index: 10 !important;
+    }
+
+    /* 3) Nudge them outside the cards */
+    #upcomingCarousel .carousel-control-prev {
+        left: -1rem !important;
+    }
+
+    #upcomingCarousel .carousel-control-next {
+        right: -1rem !important;
+    }
+
+        /* 4) Use Bootstrap Icons – make sure these <i> tags are in your HTML */
+        #upcomingCarousel .carousel-control-prev i,
+        #upcomingCarousel .carousel-control-next i {
+            font-size: 2rem;
+            color: #333;
+        }

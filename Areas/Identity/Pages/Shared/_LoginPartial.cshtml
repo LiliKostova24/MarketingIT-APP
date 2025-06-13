@@ -1,0 +1,16 @@
+@using Microsoft.AspNetCore.Identity
+@using MarketingIT.Areas.Identity.Data
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<div class="nav-item d-flex align-items-center">
+    <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Profile">
+        Profile
+    </a>
+</div>
+<div class="nav-item">
+    <form id="logoutForm" class="form-inline d-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = string.Empty })">
+        <button id="logout" type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+    </form>
+</div>

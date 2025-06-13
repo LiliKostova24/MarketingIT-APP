@@ -1,0 +1,115 @@
+﻿@model MarketingIT.Models.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="container py-5">
+  <!-- PROFILE HEADER -->
+  <div class="card mb-4 shadow-sm p-3">
+    <div class="row align-items-center">
+      <div class="col-auto">
+        <img src="@Url.Content(Model.AvatarPath ?? "~/images/default-avatar.png")"
+             class="rounded-circle"
+             style="width:80px; height:80px;"
+             alt="Avatar" />
+      </div>
+      <div class="col">
+        <h3 class="mb-1">
+          @Model.FirstName @Model.LastName
+          <small class="text-muted">(@Model.Email)</small>
+        </h3>
+        <p class="text-muted mb-2">@Model.Email</p>
+        <a asp-action="Edit"
+    asp-route-username="@Model.Username"
+    class="btn btn-outline-primary">
+   Edit Profile
+ </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- POSTS LIST -->
+  <h4 class="mb-3">Your Posts</h4>
+
+  @if (!Model.Posts.Any())
+  {
+    <div class="alert alert-info">
+      You haven’t posted anything yet.
+    </div>
+  }
+  else
+  {
+    @foreach (var post in Model.Posts)
+    {
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+  <small class="text-muted">@post.CreatedAt:g</small>
+  <div class="d-flex gap-2">
+    <span class="badge bg-danger d-flex align-items-center">
+      <i class="bi bi-heart-fill me-1"></i>
+      @post.Likes.Count()
+    </span>
+    <span class="badge bg-secondary d-flex align-items-center">
+      <i class="bi bi-chat-left-text me-1"></i>
+      @post.Comments.Count()
+    </span>
+  </div>
+</div>
+
+          <hr />
+          
+
+             @switch(post.Type)
+{
+  case PostType.Post:
+    <p class="card-text">@post.Content</p>
+    @if (post.Images?.Any() == true)
+    {
+      foreach (var img in post.Images)
+      {
+        <img src="@Url.Content(img.Url)"
+             class="img-fluid mb-2 rounded"
+             style="max-height:200px;object-fit:cover;" />
+      }
+    }
+    break;
+
+  case PostType.Article:
+    <div class="card-text article-text">@Html.Raw(post.Content)</div>
+    break;
+
+  case PostType.Survey:
+    <p class="fw-bold">@post.SurveyQuestion</p>
+    <ul class="list-unstyled mb-2">
+      @{
+        var opts = (post.SurveyOptions ?? "")
+                      .Split("||", StringSplitOptions.RemoveEmptyEntries);
+      }
+      @foreach (var opt in opts)
+      {
+        <li><i class="bi bi-square me-1"></i>@opt</li>
+      }
+    </ul>
+    break;
+}
+
+
+          @if (post.Comments.Any())
+          {
+            <hr />
+            <div class="list-group">
+              @foreach (var c in post.Comments)
+              {
+                <div class="list-group-item">
+                  <strong>@c.User?.FirstName:</strong> @c.Text
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

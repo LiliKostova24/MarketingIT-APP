@@ -1,0 +1,122 @@
+﻿@model IEnumerable<MarketingIT.Models.Post>
+@using MarketingIT.Models
+
+<div class="container py-5">
+  <h2 class="mb-4">Moderate Posts</h2>
+
+  @if (!Model.Any())
+  {
+    <div class="alert alert-info">No posts to moderate.</div>
+  }
+  else
+  {
+    <div class="row g-4">
+      @foreach (var post in Model)
+      {
+        <div class="col-md-6">
+          <div class="card shadow-sm h-100">
+            <div class="card-body d-flex flex-column">
+
+              <!-- header: author + date -->
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="card-title mb-0">
+                  @if (post.User != null) {
+                    @($"{post.User.FirstName} {post.User.LastName}")
+                  } else {
+                    <span class="text-muted">[Deleted User]</span>
+                  }
+                </h5>
+                <small class="text-muted">@post.CreatedAt:g</small>
+              </div>
+              <hr />
+
+              <!-- body: content / images / survey -->
+              @switch(post.Type)
+              {
+                case PostType.Post:
+                  <p class="card-text flex-grow-1">@post.Content</p>
+                  @if (post.Images?.Any() == true)
+                  {
+                    <div class="mb-3">
+                      @foreach (var img in post.Images)
+                      {
+                        <img src="@Url.Content(img.Url)"
+                             class="img-fluid rounded mb-2"
+                             style="max-height:150px; object-fit:cover;"
+                             alt="Post image" />
+                      }
+                    </div>
+                  }
+                  break;
+
+                case PostType.Article:
+                  <div class="card-text article-text flex-grow-1">
+                    @Html.Raw(post.Content)
+                  </div>
+                  break;
+
+                case PostType.Survey:
+                  <p class="fw-bold">@post.SurveyQuestion</p>
+                  <ul class="list-unstyled mb-3">
+                    @{
+                      var opts = (post.SurveyOptions ?? "")
+                                   .Split("||", StringSplitOptions.RemoveEmptyEntries);
+                    }
+                    @foreach (var opt in opts)
+                    {
+                      <li>
+                        <label><input type="checkbox" disabled class="me-1" /> @opt</label>
+                      </li>
+                    }
+                  </ul>
+                  break;
+              }
+
+              <!-- comments -->
+              @if (post.Comments?.Any() == true)
+              {
+                <hr />
+                <strong>Comments</strong>
+                <div class="list-group mb-3">
+                  @foreach (var c in post.Comments)
+                  {
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>
+                        @if (c.User != null)
+                        {
+                          <strong>@c.User.FirstName:</strong> @c.Text
+                        }
+                        else
+                        {
+                          <strong class="text-muted">[Deleted User]:</strong> @c.Text
+                        }
+                      </span>
+                      <form asp-action="DeleteComment" method="post" class="ms-3">
+                        <input type="hidden" name="id" value="@c.Id" />
+                        <button class="btn btn-sm btn-outline-danger">Delete</button>
+                      </form>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- footer: delete post -->
+              <div class="mt-auto text-end">
+                <form asp-action="DeletePost" method="post" onsubmit="return confirm('Delete this post?');">
+                  <input type="hidden" name="id" value="@post.Id" />
+                  <button class="btn btn-danger btn-sm">Delete Post</button>
+                </form>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+}
+

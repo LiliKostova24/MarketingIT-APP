@@ -1,0 +1,41 @@
+﻿@model MarketingIT.Models.Event
+@{
+    Layout = null;
+}
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>🚨 Test Create Event</title>
+</head>
+<body>
+  <h2>🚨 Test Create Event</h2>
+
+  <form id="testForm" method="post" action="/Events/CreateTest">
+    @Html.AntiForgeryToken()
+
+    <div>
+      <label for="Title">Title</label>
+      <input id="Title" name="Title" value="TestEvent" />
+    </div>
+
+    <div>
+      <label for="Date">Date</label>
+      <input id="Date" name="Date" type="datetime-local"
+             value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+    </div>
+
+    <button type="submit">Submit Test</button>
+  </form>
+
+  <script>
+    document
+      .getElementById('testForm')
+      .addEventListener('submit', function (e) {
+        console.log('🟢 testForm onsubmit fired');
+      });
+  </script>
+</body>
+</html>

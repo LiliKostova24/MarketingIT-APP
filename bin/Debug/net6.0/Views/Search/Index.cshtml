@@ -1,0 +1,44 @@
+﻿@model MarketingIT.Models.SearchResultsViewModel
+
+<h2>Search Results for "@Model.Query"</h2>
+
+@if (!Model.Users.Any() && !Model.Posts.Any())
+{
+    <p>No results found.</p>
+}
+else
+{
+    @if (Model.Users.Any())
+    {
+        <h3>Users Matching</h3>
+        <ul class="list-group mb-4">
+            @foreach (var user in Model.Users)
+            {
+                <li class="list-group-item">
+                    <a asp-controller="Profile" asp-action="Index" asp-route-username="@user.UserName">
+                        @user.FirstName @user.LastName (@user.UserName)
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+
+    @if (Model.Posts.Any())
+    {
+        <h3>Posts Matching</h3>
+        @foreach (var post in Model.Posts)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a asp-controller="Profile" asp-action="Index" asp-route-username="@post.User.UserName">
+                            @post.User.FirstName @post.User.LastName
+                        </a>
+                    </h5>
+                    <p class="card-text">@post.Content</p>
+                    <p class="card-text"><small class="text-muted">Posted on @post.CreatedAt.ToString("g")</small></p>
+                </div>
+            </div>
+        }
+    }
+}

@@ -1,0 +1,44 @@
+﻿@using MarketingIT.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+@model IEnumerable<ApplicationUser>
+@inject UserManager<MarketingIT.Areas.Identity.Data.ApplicationUser> UserManager
+
+
+<h2>User Management</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>UserName</th>
+            <th>Email</th>
+            <th>Roles</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var user in Model)
+{
+    <tr>
+        <td>@user.UserName</td>
+        <td>@user.Email</td>
+        <td>
+            @string.Join(", ", await UserManager.GetRolesAsync(user))
+
+        </td>
+        <td>
+            <form method="post" asp-action="Delete" asp-route-id="@user.Id" style="display:inline;">
+                <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+            </form>
+            <form method="post" asp-action="ChangeRole" asp-route-id="@user.Id" style="display:inline;">
+                <select name="role" class="form-select d-inline w-auto">
+                    <option>User</option>
+                    <option>Admin</option>
+                    <option>ITCompany</option>
+                </select>
+                <button class="btn btn-sm btn-warning">Change Role</button>
+            </form>
+        </td>
+    </tr>
+}
+    </tbody>
+</table>

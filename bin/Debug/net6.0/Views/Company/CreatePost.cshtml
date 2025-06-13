@@ -1,0 +1,68 @@
+﻿@using MarketingIT.Models       @* for PostType *@
+@model MarketingIT.Models.ViewModels.PostFormModel
+
+<form asp-action="CreatePost" method="post" enctype="multipart/form-data">
+  @Html.AntiForgeryToken()
+
+  <!-- 1) Type selector -->
+  <div class="mb-3">
+    <label asp-for="Type"></label>
+    <select asp-for="Type" id="postType" class="form-select">
+      <option value="">— select —</option>
+      <option value="Post">Post</option>
+      <option value="Article">Article</option>
+      <option value="Survey">Survey</option>
+    </select>
+    <span asp-validation-for="Type" class="text-danger"></span>
+  </div>
+
+  <!-- 2) Post (text + image) -->
+  <div id="postFields" class="type-specific" style="display:none;">
+    <label asp-for="Text">Text</label>
+    <textarea asp-for="Text" class="form-control"></textarea>
+    <span asp-validation-for="Text" class="text-danger"></span>
+
+    <label asp-for="Photo">Image</label>
+    <input asp-for="Photo" type="file" class="form-control" />
+    <span asp-validation-for="Photo" class="text-danger"></span>
+  </div>
+
+  <!-- 3) Article (text only) -->
+  <div id="articleFields" class="type-specific" style="display:none;">
+    <label asp-for="Text">Article</label>
+    <textarea asp-for="Text" class="form-control"></textarea>
+    <span asp-validation-for="Text" class="text-danger"></span>
+  </div>
+
+  <!-- 4) Survey (question + 3 answers) -->
+  <div id="surveyFields" class="type-specific" style="display:none;">
+    <label asp-for="SurveyQuestion">Question</label>
+    <input asp-for="SurveyQuestion" class="form-control" />
+    <span asp-validation-for="SurveyQuestion" class="text-danger"></span>
+
+    <label>Answers</label>
+    <input asp-for="SurveyOption1" class="form-control mb-1" placeholder="Answer #1" />
+    <span asp-validation-for="SurveyOption1" class="text-danger"></span>
+    <input asp-for="SurveyOption2" class="form-control mb-1" placeholder="Answer #2" />
+    <span asp-validation-for="SurveyOption2" class="text-danger"></span>
+    <input asp-for="SurveyOption3" class="form-control" placeholder="Answer #3" />
+    <span asp-validation-for="SurveyOption3" class="text-danger"></span>
+  </div>
+
+  <button type="submit" class="btn btn-primary mt-3">Create</button>
+</form>
+
+@section Scripts {
+  <script>
+    const sel = document.getElementById('postType');
+    const types = ['post','article','survey'];
+    sel.addEventListener('change', e => {
+      types.forEach(t => document.getElementById(t + 'Fields').style.display = 'none');
+      if (!e.target.value) return;
+      document.getElementById(e.target.value.toLowerCase() + 'Fields')
+              .style.display = 'block';
+    });
+  </script>
+  <partial name="_ValidationScriptsPartial" />
+}
+
